@@ -1,153 +1,150 @@
-# gstack development
+# gstack 开发
 
-## Commands
+## 命令
 
 ```bash
-bun install          # install dependencies
-bun test             # run free tests (browse + snapshot + skill validation)
-bun run test:evals   # run paid evals: LLM judge + E2E (~$4/run)
-bun run test:e2e     # run E2E tests only (~$3.85/run)
-bun run dev <cmd>    # run CLI in dev mode, e.g. bun run dev goto https://example.com
-bun run build        # gen docs + compile binaries
-bun run gen:skill-docs  # regenerate SKILL.md files from templates
-bun run skill:check  # health dashboard for all skills
-bun run dev:skill    # watch mode: auto-regen + validate on change
-bun run eval:list    # list all eval runs from ~/.gstack-dev/evals/
-bun run eval:compare # compare two eval runs (auto-picks most recent)
-bun run eval:summary # aggregate stats across all eval runs
+bun install          # 安装依赖
+bun test             # 运行免费测试 (browse + snapshot + skill 验证)
+bun run test:evals   # 运行付费评估: LLM judge + E2E (~$4/次)
+bun run test:e2e     # 仅运行 E2E 测试 (~$3.85/次)
+bun run dev <cmd>    # 开发模式运行 CLI，如 bun run dev goto https://example.com
+bun run build        # 生成文档 + 编译二进制文件
+bun run gen:skill-docs  # 从模板重新生成 SKILL.md 文件
+bun run skill:check  # 所有技能的健康状态仪表板
+bun run dev:skill    # 监视模式: 自动重新生成 + 更改时验证
+bun run eval:list    # 列出 ~/.gstack-dev/evals/ 中所有评估运行
+bun run eval:compare # 比较两次评估运行 (自动选择最近两次)
+bun run eval:summary # 跨所有评估运行的聚合统计
 ```
 
-`test:evals` requires `ANTHROPIC_API_KEY`. E2E tests stream progress in real-time
-(tool-by-tool via `--output-format stream-json --verbose`). Results are persisted
-to `~/.gstack-dev/evals/` with auto-comparison against the previous run.
+`test:evals` 需要 `ANTHROPIC_API_KEY`。E2E 测试实时流式传输进度
+(通过 `--output-format stream-json --verbose` 逐个工具输出)。结果持久化
+到 `~/.gstack-dev/evals/`，并自动与上一次运行进行比较。
 
-## Project structure
+## 项目结构
 
 ```
 gstack/
-├── browse/          # Headless browser CLI (Playwright)
-│   ├── src/         # CLI + server + commands
-│   │   ├── commands.ts  # Command registry (single source of truth)
-│   │   └── snapshot.ts  # SNAPSHOT_FLAGS metadata array
-│   ├── test/        # Integration tests + fixtures
-│   └── dist/        # Compiled binary
-├── scripts/         # Build + DX tooling
-│   ├── gen-skill-docs.ts  # Template → SKILL.md generator
-│   ├── skill-check.ts     # Health dashboard
-│   └── dev-skill.ts       # Watch mode
-├── test/            # Skill validation + eval tests
+├── browse/          # 无头浏览器 CLI (Playwright)
+│   ├── src/         # CLI + 服务器 + 命令
+│   │   ├── commands.ts  # 命令注册表 (单一事实来源)
+│   │   └── snapshot.ts  # SNAPSHOT_FLAGS 元数据数组
+│   ├── test/        # 集成测试 + 固定装置
+│   └── dist/        # 编译的二进制文件
+├── scripts/         # 构建 + DX 工具
+│   ├── gen-skill-docs.ts  # 模板 → SKILL.md 生成器
+│   ├── skill-check.ts     # 健康仪表板
+│   └── dev-skill.ts       # 监视模式
+├── test/            # Skill 验证 + 评估测试
 │   ├── helpers/     # skill-parser.ts, session-runner.ts, llm-judge.ts, eval-store.ts
-│   ├── fixtures/    # Ground truth JSON, planted-bug fixtures, eval baselines
-│   ├── skill-validation.test.ts  # Tier 1: static validation (free, <1s)
-│   ├── gen-skill-docs.test.ts    # Tier 1: generator quality (free, <1s)
-│   ├── skill-llm-eval.test.ts   # Tier 3: LLM-as-judge (~$0.15/run)
-│   └── skill-e2e.test.ts         # Tier 2: E2E via claude -p (~$3.85/run)
-├── qa-only/         # /qa-only skill (report-only QA, no fixes)
-├── plan-design-review/  # /plan-design-review skill (report-only design audit)
-├── qa-design-review/    # /qa-design-review skill (design audit + fix loop)
+│   ├── fixtures/    # 基准 JSON, 埋藏的 bug 固定装置, 评估基线
+│   ├── skill-validation.test.ts  # 层级 1: 静态验证 (免费, <1s)
+│   ├── gen-skill-docs.test.ts    # 层级 1: 生成器质量 (免费, <1s)
+│   ├── skill-llm-eval.test.ts   # 层级 3: LLM-as-judge (~$0.15/次)
+│   └── skill-e2e.test.ts         # 层级 2: 通过 claude -p E2E (~$3.85/次)
+├── qa-only/         # /qa-only skill (仅报告 QA, 无修复)
+├── plan-design-review/  # /plan-design-review skill (仅报告设计审计)
+├── qa-design-review/    # /qa-design-review skill (设计审计 + 修复循环)
 ├── ship/            # Ship workflow skill
 ├── review/          # PR review skill
 ├── plan-ceo-review/ # /plan-ceo-review skill
 ├── plan-eng-review/ # /plan-eng-review skill
 ├── retro/           # Retrospective skill
-├── document-release/ # /document-release skill (post-ship doc updates)
-├── setup            # One-time setup: build binary + symlink skills
-├── SKILL.md         # Generated from SKILL.md.tmpl (don't edit directly)
-├── SKILL.md.tmpl    # Template: edit this, run gen:skill-docs
-└── package.json     # Build scripts for browse
+├── document-release/ # /document-release skill (发布后文档更新)
+├── setup            # 一次性设置: 构建二进制文件 + 符号链接技能
+├── SKILL.md         # 从 SKILL.md.tmpl 生成 (不要直接编辑)
+├── SKILL.md.tmpl    # 模板: 编辑这个, 运行 gen:skill-docs
+└── package.json     # browse 的构建脚本
 ```
 
-## SKILL.md workflow
+## SKILL.md 工作流
 
-SKILL.md files are **generated** from `.tmpl` templates. To update docs:
+SKILL.md 文件是从 `.tmpl` 模板**生成**的。要更新文档:
 
-1. Edit the `.tmpl` file (e.g. `SKILL.md.tmpl` or `browse/SKILL.md.tmpl`)
-2. Run `bun run gen:skill-docs` (or `bun run build` which does it automatically)
-3. Commit both the `.tmpl` and generated `.md` files
+1. 编辑 `.tmpl` 文件 (例如 `SKILL.md.tmpl` 或 `browse/SKILL.md.tmpl`)
+2. 运行 `bun run gen:skill-docs` (或 `bun run build` 会自动执行)
+3. 同时提交 `.tmpl` 和生成的 `.md` 文件
 
-To add a new browse command: add it to `browse/src/commands.ts` and rebuild.
-To add a snapshot flag: add it to `SNAPSHOT_FLAGS` in `browse/src/snapshot.ts` and rebuild.
+要添加新的 browse 命令: 将其添加到 `browse/src/commands.ts` 并重新构建。
+要添加 snapshot 标志: 将其添加到 `browse/src/snapshot.ts` 的 `SNAPSHOT_FLAGS` 中并重新构建。
 
-## Writing SKILL templates
+## 编写 SKILL 模板
 
-SKILL.md.tmpl files are **prompt templates read by Claude**, not bash scripts.
-Each bash code block runs in a separate shell — variables do not persist between blocks.
+SKILL.md.tmpl 文件是 **Claude 读取的提示模板**，不是 bash 脚本。
+每个 bash 代码块在单独的 shell 中运行 — 变量不会在代码块之间持久化。
 
-Rules:
-- **Use natural language for logic and state.** Don't use shell variables to pass
-  state between code blocks. Instead, tell Claude what to remember and reference
-  it in prose (e.g., "the base branch detected in Step 0").
-- **Don't hardcode branch names.** Detect `main`/`master`/etc dynamically via
-  `gh pr view` or `gh repo view`. Use `{{BASE_BRANCH_DETECT}}` for PR-targeting
-  skills. Use "the base branch" in prose, `<base>` in code block placeholders.
-- **Keep bash blocks self-contained.** Each code block should work independently.
-  If a block needs context from a previous step, restate it in the prose above.
-- **Express conditionals as English.** Instead of nested `if/elif/else` in bash,
-  write numbered decision steps: "1. If X, do Y. 2. Otherwise, do Z."
+规则:
+- **使用自然语言表达逻辑和状态。** 不要使用 shell 变量在
+  代码块之间传递状态。相反，告诉 Claude 记住什么，并在散文中引用它
+  (例如，"步骤 0 中检测到的基础分支")。
+- **不要硬编码分支名称。** 通过 `gh pr view` 或 `gh repo view` 动态检测 `main`/`master`/等。
+  对于面向 PR 的技能使用 `{{BASE_BRANCH_DETECT}}`。在散文中使用"基础分支"，在代码块占位符中使用 `<base>`。
+- **保持 bash 块自包含。** 每个代码块应该独立工作。
+  如果一个块需要来自前一个步骤的上下文，在上面的散文中重新说明。
+- **用英语表达条件。** 不要在 bash 中使用嵌套的 `if/elif/else`，
+  写编号的决策步骤: "1. 如果 X，做 Y。2. 否则，做 Z。"
 
-## Browser interaction
+## 浏览器交互
 
-When you need to interact with a browser (QA, dogfooding, cookie setup), use the
-`/browse` skill or run the browse binary directly via `$B <command>`. NEVER use
-`mcp__claude-in-chrome__*` tools — they are slow, unreliable, and not what this
-project uses.
+当需要与浏览器交互 (QA、dogfooding、cookie 设置) 时，使用
+`/browse` skill 或直接通过 `$B <command>` 运行 browse 二进制文件。**切勿**使用
+`mcp__claude-in-chrome__*` 工具 — 它们慢、不可靠，且不是本项目使用的。
 
-## Vendored symlink awareness
+## 供应商符号链接感知
 
-When developing gstack, `.claude/skills/gstack` may be a symlink back to this
-working directory (gitignored). This means skill changes are **live immediately** —
-great for rapid iteration, risky during big refactors where half-written skills
-could break other Claude Code sessions using gstack concurrently.
+开发 gstack 时，`.claude/skills/gstack` 可能是一个指回此
+工作目录的符号链接 (gitignored)。这意味着 skill 更改是**即时生效的** —
+非常适合快速迭代，但在大重构期间有风险，因为一半编写的技能可能会破坏
+同时使用 gstack 的其他 Claude Code 会话。
 
-**Check once per session:** Run `ls -la .claude/skills/gstack` to see if it's a
-symlink or a real copy. If it's a symlink to your working directory, be aware that:
-- Template changes + `bun run gen:skill-docs` immediately affect all gstack invocations
-- Breaking changes to SKILL.md.tmpl files can break concurrent gstack sessions
-- During large refactors, remove the symlink (`rm .claude/skills/gstack`) so the
-  global install at `~/.claude/skills/gstack/` is used instead
+**每会话检查一次:** 运行 `ls -la .claude/skills/gstack` 以查看它是否是
+符号链接或真实副本。如果它是指向工作目录的符号链接，请注意:
+- 模板更改 + `bun run gen:skill-docs` 立即影响所有 gstack 调用
+- 对 SKILL.md.tmpl 文件的破坏性更改可能破坏并发的 gstack 会话
+- 在大重构期间，删除符号链接 (`rm .claude/skills/gstack`) 以便使用
+  `~/.claude/skills/gstack/` 处的全局安装
 
-**For plan reviews:** When reviewing plans that modify skill templates or the
-gen-skill-docs pipeline, consider whether the changes should be tested in isolation
-before going live (especially if the user is actively using gstack in other windows).
+**对于计划审查:** 当审查修改 skill 模板或
+gen-skill-docs 流程的计划时，考虑更改是否应该
+在上线前进行隔离测试 (特别是如果用户在其他窗口中积极使用 gstack)。
 
-## CHANGELOG style
+## CHANGELOG 风格
 
-CHANGELOG.md is **for users**, not contributors. Write it like product release notes:
+CHANGELOG.md 是**给用户的**，不是给贡献者的。像产品发布说明一样写它:
 
-- Lead with what the user can now **do** that they couldn't before. Sell the feature.
-- Use plain language, not implementation details. "You can now..." not "Refactored the..."
-- Put contributor/internal changes in a separate "For contributors" section at the bottom.
-- Every entry should make someone think "oh nice, I want to try that."
-- No jargon: say "every question now tells you which project and branch you're in" not
-  "AskUserQuestion format standardized across skill templates via preamble resolver."
+- 首先说明用户现在可以**做**以前做不到的事情。推销该功能。
+- 使用简单的语言，而不是实现细节。"你现在可以..."而不是"重构了..."
+- 将贡献者/内部更改放在底部的单独"致贡献者"部分。
+- 每个条目应该让某人想到"噢不错，我想试试那个。"
+- 没有行话: 说"每个问题现在告诉你你在哪个项目和分支"而不是
+  "通过前导解析器标准化了 skill 模板中的 AskUserQuestion 格式。"
 
-## Local plans
+## 本地计划
 
-Contributors can store long-range vision docs and design documents in `~/.gstack-dev/plans/`.
-These are local-only (not checked in). When reviewing TODOS.md, check `plans/` for candidates
-that may be ready to promote to TODOs or implement.
+贡献者可以将长期愿景文档和设计文档存储在 `~/.gstack-dev/plans/`。
+这些是本地专用的 (不签入)。审查 TODOS.md 时，检查 `plans/` 中可能已准备好
+提升为 TODOs 或实施的候选。
 
-## E2E eval failure blame protocol
+## E2E 评估失败归责协议
 
-When an E2E eval fails during `/ship` or any other workflow, **never claim "not
-related to our changes" without proving it.** These systems have invisible couplings —
-a preamble text change affects agent behavior, a new helper changes timing, a
-regenerated SKILL.md shifts prompt context.
+当 `/ship` 或任何其他工作流中的 E2E 评估失败时，**切勿在没有证明的情况下声称"不
+与我们的更改相关"。** 这些系统有看不见的耦合 — 前导文本更改影响代理行为，
+新的 helper 更改时序，重新生成的 SKILL.md 转移提示上下文。
 
-**Required before attributing a failure to "pre-existing":**
-1. Run the same eval on main (or base branch) and show it fails there too
-2. If it passes on main but fails on the branch — it IS your change. Trace the blame.
-3. If you can't run on main, say "unverified — may or may not be related" and flag it
-   as a risk in the PR body
+**在将失败归因于"预先存在"之前必须:**
+1. 在 main (或基础分支) 上运行相同的评估并显示它在那里也失败
+2. 如果它在 main 上通过但在分支上失败 — 它**是**你的更改。追踪责任。
+3. 如果无法在 main 上运行，说"未验证 — 可能或可能不相关"并将其标记
+   为 PR 正文中的风险
 
-"Pre-existing" without receipts is a lazy claim. Prove it or don't say it.
+没有收据的"预先存在"是懒惰的说法。证明它或不要说它。
 
-## Deploying to the active skill
+## 部署到活动技能
 
-The active skill lives at `~/.claude/skills/gstack/`. After making changes:
+活动技能位于 `~/.claude/skills/gstack/`。进行更改后:
 
-1. Push your branch
-2. Fetch and reset in the skill directory: `cd ~/.claude/skills/gstack && git fetch origin && git reset --hard origin/main`
-3. Rebuild: `cd ~/.claude/skills/gstack && bun run build`
+1. 推送分支
+2. 在技能目录中 fetch 并 reset: `cd ~/.claude/skills/gstack && git fetch origin && git reset --hard origin/main`
+3. 重新构建: `cd ~/.claude/skills/gstack && bun run build`
 
-Or copy the binary directly: `cp browse/dist/browse ~/.claude/skills/gstack/browse/dist/browse`
+或者直接复制二进制文件: `cp browse/dist/browse ~/.claude/skills/gstack/browse/dist/browse`

@@ -1,612 +1,598 @@
 # gstack
 
-**gstack turns Claude Code from one generic assistant into a team of specialists you can summon on demand.**
+**gstack 将 Claude Code 从一个通用的助手转变为一组您可以按需调用的专家团队。**
 
-Thirteen opinionated workflow skills for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Plan review, design review, code review, one-command shipping, browser automation, QA testing, engineering retrospectives, and post-ship documentation — all as slash commands.
+十三个针对 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) 的意见化工作流技能。计划审查、设计审查、代码审查、一键发布、浏览器自动化、QA 测试、工程回顾和发布后文档 — 全部作为斜杠命令提供。
 
-### Without gstack
+### 没有 gstack
 
-- The agent takes your request literally — it never asks if you're building the right thing
-- It will implement exactly what you said, even when the real product is something bigger
-- "Review my PR" gives inconsistent depth every time
-- "Ship this" turns into a long back-and-forth about what to do
-- The agent can write code but can't see your app — it's half blind
-- You still do QA by hand: open browser, click around, check pages, squint at layouts
+- 代理会按字面意思理解您的请求 — 从不询问您是否在构建正确的东西
+- 它会完全按照您所说的来实现，即使真正的产品更大
+- "审查我的 PR" 每次都给出不一致的深度
+- "发布这个" 会变成关于要做什么的长时间来回讨论
+- 代理可以写代码但看不到您的应用 — 它是半盲的
+- 您仍然手动进行 QA：打开浏览器，四处点击，检查页面，眯着眼睛看布局
 
-### With gstack
+### 使用 gstack
 
 | Skill | Mode | What it does |
 |-------|------|--------------|
-| `/plan-ceo-review` | Founder / CEO | Rethink the problem. Find the 10-star product hiding inside the request. |
-| `/plan-eng-review` | Eng manager / tech lead | Lock in architecture, data flow, diagrams, edge cases, and tests. |
-| `/plan-design-review` | Senior product designer | Designer's eye audit. 80-item checklist, letter grades, AI Slop detection, DESIGN.md inference. Report only — never touches code. |
-| `/design-consultation` | Design consultant | Build a complete design system from scratch. Researches competitors, proposes aesthetic + typography + color + spacing + motion, generates a preview page, and writes DESIGN.md. |
-| `/review` | Paranoid staff engineer | Find the bugs that pass CI but blow up in production. Triages Greptile review comments. |
-| `/ship` | Release engineer | Sync main, run tests, resolve Greptile reviews, push, open PR. For a ready branch, not for deciding what to build. |
-| `/browse` | QA engineer | Give the agent eyes. It logs in, clicks through your app, takes screenshots, catches breakage. Full QA pass in 60 seconds. |
-| `/qa` | QA + fix engineer | Test app, find bugs, fix them with atomic commits, re-verify. Before/after health scores and ship-readiness summary. Three tiers: Quick, Standard, Exhaustive. |
-| `/qa-only` | QA reporter | Report-only QA testing. Same methodology as /qa but never fixes anything. Use when you want a pure bug report without code changes. |
-| `/qa-design-review` | Designer + frontend engineer | Same design audit as /plan-design-review, then fixes what it finds. Atomic `style(design):` commits, before/after screenshots, CSS-safe self-regulation. |
-| `/setup-browser-cookies` | Session manager | Import cookies from your real browser (Comet, Chrome, Arc, Brave, Edge) into the headless session. Test authenticated pages without logging in manually. |
-| `/retro` | Engineering manager | Team-aware retro: your deep-dive + per-person praise and growth opportunities for every contributor. |
-| `/document-release` | Technical writer | Update README, ARCHITECTURE, CONTRIBUTING, and project docs to match what you just shipped. |
+| `/plan-ceo-review` | 创始人 / CEO | 重新思考问题。找到请求中隐藏的 10 星级产品。 |
+| `/plan-eng-review` | 工程经理 / 技术主管 | 锁定架构、数据流、图表、边界情况和测试。 |
+| `/plan-design-review` | 高级产品设计师 | 设计师眼光审查。80 项检查清单、字母评分、AI 废话检测、DESIGN.md 推断。仅报告 — 从不接触代码。 |
+| `/design-consultation` | 设计顾问 | 从头开始构建完整的设计系统。研究竞争对手，提出美学 + 字体 + 颜色 + 间距 + 动效，生成预览页面，并编写 DESIGN.md。 |
+| `/review` | 偏执的资深工程师 | 找到通过 CI 但在生产中崩溃的 bug。分类 Greptile 审查评论。 |
+| `/ship` | 发布工程师 | 同步 main，运行测试，解决 Greptile 审查，推送，打开 PR。适用于准备好的分支，不用于决定构建什么。 |
+| `/browse` | QA 工程师 | 给代理眼睛。它登录，点击您的应用，截图，捕获损坏。60 秒内完成完整 QA。 |
+| `/qa` | QA + 修复工程师 | 测试应用，查找 bug，用原子提交修复它们，重新验证。修复前后的健康评分和发布就绪摘要。三个级别：快速、标准、详尽。 |
+| `/qa-only` | QA 报告员 | 仅报告的 QA 测试。与 /qa 相同的方法论但从不修复任何内容。当您想要没有代码更改的纯 bug 报告时使用。 |
+| `/qa-design-review` | 设计师 + 前端工程师 | 与 /plan-design-review 相同的设计审查，然后修复发现的问题。原子 `style(design):` 提交，修复前后截图，CSS 安全的自我调节。 |
+| `/setup-browser-cookies` | 会话管理器 | 将 cookie 从您的真实浏览器（Comet、Chrome、Arc、Brave、Edge）导入到无头会话中。无需手动登录即可测试经过身份验证的页面。 |
+| `/retro` | 工程经理 | 团队感知的回顾：您的深入剖析 + 每位贡献者的赞扬和成长机会。 |
+| `/document-release` | 技术文档编写者 | 更新 README、ARCHITECTURE、CONTRIBUTING 和项目文档以匹配您刚刚发布的内容。 |
 
-## Demo: one feature, five modes
+## 演示：一个功能，五种模式
 
-I start almost every feature in plan mode. I describe what I want to build, then use `/plan-ceo-review` to pressure-test whether I am even building the right thing. Only after the product direction is locked do I shift into engineering, review, ship, and test.
+我几乎每个功能都从计划模式开始。我描述我想构建的内容，然后使用 `/plan-ceo-review` 来压力测试我是否在构建正确的东西。只有在产品方向确定后，我才会转向工程、审查、发布和测试。
 
 ```
-You:   [enter plan mode, describe the feature]
-       I want to add seller photo upload to the listing app. Sellers
-       should be able to upload a photo of their item and we create
-       the listing from it.
+You:   [进入计划模式，描述功能]
+       我想添加卖家照片上传到列表应用。卖家应该能够上传他们物品的照片，
+       我们从中创建列表。
 
 You:   /plan-ceo-review
 
-Claude: "Photo upload" is not the feature. The real job is helping sellers
-        create listings that actually sell. Here's what the 10-star version
-        looks like: auto-identify the product from the photo, pull specs and
-        pricing comps from the web, draft the title and description, suggest
-        the best hero image...
+Claude: "照片上传"不是功能。真正的工作是帮助卖家创建真正能销售的列表。
+        10 星级版本的样子：从照片中自动识别产品，从网上拉取规格和定价对比，
+        起草标题和描述，建议最佳主图...
 
 You:   /plan-eng-review
 
-Claude: [Architecture diagram, state machine for upload → classify → enrich
-        → draft pipeline, async job boundaries, failure modes, test matrix]
+Claude: [架构图，上传 → 分类 → 丰富 → 起草管道的状态机，异步作业边界，
+        失败模式，测试矩阵]
 
-You:   [exit plan mode, implement the plan]
+You:   [退出计划模式，实施计划]
 
 You:   /review
 
-Claude: Race condition: two tabs can overwrite cover-photo selection.
-        Trust boundary: pulling web data into draft generation creates
-        a prompt injection vector. Missing: orphan cleanup for failed uploads.
+Claude: 竞态条件：两个选项卡可以覆盖封面照片选择。
+        信任边界：将网页数据拉入草稿生成会创建提示注入向量。
+        缺失：失败上传的孤立清理。
 
-You:   (fix the issues)
+You:   （修复问题）
 
 You:   /ship
 
-Claude: [Syncs main, runs tests, pushes branch, opens PR — 6 tool calls, done]
+Claude: [同步 main，运行测试，推送分支，打开 PR — 6 个工具调用，完成]
 
 You:   /qa
 
-Claude: Analyzing branch diff... 8 files changed, 3 routes affected.
-        [Tests /listings/new, /listings/:id, /api/listings against localhost:3000]
-        All 3 routes working. Upload + enrichment flow passes end to end.
+Claude: 分析分支差异... 8 个文件更改，3 个路由受影响。
+        [在 localhost:3000 上测试 /listings/new, /listings/:id, /api/listings]
+        所有 3 个路由正常工作。上传 + 丰富流程端到端通过。
 
 You:   /setup-browser-cookies staging.myapp.com
 
-Claude: Imported 8 cookies for staging.myapp.com from Chrome.
+Claude: 从 Chrome 导入了 staging.myapp.com 的 8 个 cookie。
 
 You:   /qa https://staging.myapp.com --quick
 
-Claude: [Smoke test: homepage + 5 pages, 30 seconds]
-        Health Score: 91/100. No critical issues. 1 medium: mobile nav overlap.
+Claude: [冒烟测试：首页 + 5 个页面，30 秒]
+        健康评分：91/100。无关键问题。1 个中等：移动导航重叠。
 
 You:   /plan-design-review https://staging.myapp.com
 
-Claude: Design Score: B  |  AI Slop Score: C
+Claude: 设计评分：B  |  AI 废话评分：C
 
-        "The site communicates competence but not confidence."
-        "I notice the spacing between sections is uniform — nothing feels important."
-        "The first 3 things my eye goes to are: the gradient hero, a 3-column
-         feature grid with icons in circles, and a cookie-cutter CTA."
-        "If I had to describe this in one word: template."
+        "网站传达能力但不传达信心。"
+        "我注意到各部分之间的间距是统一的 — 没有什么感觉重要。"
+        "我的眼睛首先看到的 3 个东西是：渐变主图、3 列带圆形图标的特性网格，
+         和一个模板化的 CTA。"
+        "如果我用一个词来描述：模板。"
 
-        Top issues: generic typography (Inter everywhere), AI slop patterns
-        (3-column icon grid, purple gradient), flat heading scale.
+        主要问题：通用字体（到处都是 Inter），AI 废话模式（3 列图标网格，
+        紫色渐变），扁平的标题缩放。
 
-        [Full report with letter grades, 12 findings, inferred design system]
-        Want me to save this as your DESIGN.md?
+        [完整报告及字母评分、12 个发现、推断的设计系统]
+        想要我将其保存为您的 DESIGN.md 吗？
 
 You:   /qa-design-review
 
-Claude: [Runs the same audit, then fixes 8 design issues]
-        style(design): FINDING-001 — replace Inter with system font stack
-        style(design): FINDING-003 — add heading scale contrast
-        style(design): FINDING-007 — break 3-column grid into asymmetric layout
-        Design Score: B → A-  |  AI Slop Score: C → A
+Claude: [运行相同的审查，然后修复 8 个设计问题]
+        style(design): FINDING-001 — 将 Inter 替换为系统字体堆栈
+        style(design): FINDING-003 — 添加标题缩放对比
+        style(design): FINDING-007 — 将 3 列网格拆分为不对称布局
+        设计评分：B → A-  |  AI 废话评分：C → A
 ```
 
-## Who this is for
+## 适用人群
 
-You already use Claude Code heavily and want consistent, high-rigor workflows instead of one mushy generic mode. You want to tell the model what kind of brain to use right now — founder taste, engineering rigor, paranoid review, or fast execution.
+您已经大量使用 Claude Code，并希望始终如一的高严格度工作流程，而不是一个模糊的通用模式。您想告诉模型现在应该使用什么样的大脑 — 创始人品味、工程严格度、偏执的审查或快速执行。
 
-This is not a prompt pack for beginners. It is an operating system for people who ship.
+这不是给初学者的提示包。它是给发布产品的人的操作系统。
 
-## How to fly: 10 sessions at once
+## 如何飞翔：同时运行 10 个会话
 
-gstack is powerful with one Claude Code session. It is transformative with ten.
+gstack 在一个 Claude Code 会话中很强大。在十个会话中则是革命性的。
 
-[Conductor](https://conductor.build) runs multiple Claude Code sessions in parallel — each in its own isolated workspace. That means you can have one session running `/qa` on staging, another doing `/review` on a PR, a third implementing a feature, and seven more working on other branches. All at the same time.
+[Conductor](https://conductor.build) 并行运行多个 Claude Code 会话 — 每个都有自己的独立工作区。这意味着您可以有一个会话在 staging 上运行 `/qa`，另一个在 PR 上执行 `/review`，第三个实现一个功能，还有七个在其他分支上工作。所有这些同时进行。
 
-Each workspace gets its own isolated browser instance automatically — separate Chromium process, cookies, tabs, and logs stored in `.gstack/` inside each project root. No port collisions, no shared state, no configuration needed. `/browse` and `/qa` sessions never interfere with each other, even across ten parallel workspaces.
+每个工作区自动获得自己的独立浏览器实例 — 独立的 Chromium 进程、cookie、选项卡和存储在每个项目根目录的 `.gstack/` 中的日志。没有端口冲突，没有共享状态，无需配置。`/browse` 和 `/qa` 会话永远不会相互干扰，即使跨越十个并行工作区。
 
-This is the setup I use. One person, ten parallel agents, each with the right cognitive mode for its task. That is not incremental improvement. That is a different way of building software.
+这就是我使用的设置。一个人，十个并行代理，每个都有适合其任务的正确认知模式。这不是增量改进。这是构建软件的不同方式。
 
-## Install
+## 安装
 
-**Requirements:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Git](https://git-scm.com/), [Bun](https://bun.sh/) v1.0+. `/browse` compiles a native binary — works on macOS and Linux (x64 and arm64).
+**要求：** [Claude Code](https://docs.anthropic.com/en/docs/claude-code)、[Git](https://git-scm.com/)、[Bun](https://bun.sh/) v1.0+。`/browse` 编译原生二进制文件 — 适用于 macOS 和 Linux（x64 和 arm64）。
 
-### Step 1: Install on your machine
+### 步骤 1：在您的机器上安装
 
-Open Claude Code and paste this. Claude will do the rest.
+打开 Claude Code 并粘贴此内容。Claude 将完成剩下的工作。
 
-> Install gstack: run `git clone https://github.com/garrytan/gstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup` then add a "gstack" section to CLAUDE.md that says to use the /browse skill from gstack for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, and lists the available skills: /plan-ceo-review, /plan-eng-review, /plan-design-review, /design-consultation, /review, /ship, /browse, /qa, /qa-only, /qa-design-review, /setup-browser-cookies, /retro, /document-release. Then ask the user if they also want to add gstack to the current project so teammates get it.
+> 安装 gstack：运行 `git clone https://github.com/garrytan/gstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup`，然后在 CLAUDE.md 中添加一个 "gstack" 部分，说明对于所有网页浏览使用 gstack 的 /browse 技能，永远不要使用 mcp__claude-in-chrome__* 工具，并列出可用技能：/plan-ceo-review、/plan-eng-review、/plan-design-review、/design-consultation、/review、/ship、/browse、/qa、/qa-only、/qa-design-review、/setup-browser-cookies、/retro、/document-release。然后询问用户是否也想将 gstack 添加到当前项目以便团队成员获得它。
 
-### Step 2: Add to your repo so teammates get it (optional)
+### 步骤 2：添加到您的仓库以便团队成员获得它（可选）
 
-> Add gstack to this project: run `cp -Rf ~/.claude/skills/gstack .claude/skills/gstack && rm -rf .claude/skills/gstack/.git && cd .claude/skills/gstack && ./setup` then add a "gstack" section to this project's CLAUDE.md that says to use the /browse skill from gstack for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, lists the available skills: /plan-ceo-review, /plan-eng-review, /plan-design-review, /design-consultation, /review, /ship, /browse, /qa, /qa-only, /qa-design-review, /setup-browser-cookies, /retro, /document-release, and tells Claude that if gstack skills aren't working, run `cd .claude/skills/gstack && ./setup` to build the binary and register skills.
+> 将 gstack 添加到此项目：运行 `cp -Rf ~/.claude/skills/gstack .claude/skills/gstack && rm -rf .claude/skills/gstack/.git && cd .claude/skills/gstack && ./setup`，然后在此项目的 CLAUDE.md 中添加一个 "gstack" 部分，说明对于所有网页浏览使用 gstack 的 /browse 技能，永远不要使用 mcp__claude-in-chrome__* 工具，列出可用技能：/plan-ceo-review、/plan-eng-review、/plan-design-review、/design-consultation、/review、/ship、/browse、/qa、/qa-only、/qa-design-review、/setup-browser-cookies、/retro、/document-release，并告诉 Claude 如果 gstack 技能不工作，运行 `cd .claude/skills/gstack && ./setup` 来构建二进制文件并注册技能。
 
-Real files get committed to your repo (not a submodule), so `git clone` just works. The binary and node\_modules are gitignored — teammates just need to run `cd .claude/skills/gstack && ./setup` once to build (or `/browse` handles it automatically on first use).
+真实文件会提交到您的仓库（不是子模块），所以 `git clone` 就可以工作。二进制文件和 node_modules 被 gitignored — 团队成员只需运行 `cd .claude/skills/gstack && ./setup` 一次来构建（或者 `/browse` 在首次使用时自动处理）。
 
-### What gets installed
+### 安装了什么
 
-- Skill files (Markdown prompts) in `~/.claude/skills/gstack/` (or `.claude/skills/gstack/` for project installs)
-- Symlinks at `~/.claude/skills/browse`, `~/.claude/skills/qa`, `~/.claude/skills/review`, etc. pointing into the gstack directory
-- Browser binary at `browse/dist/browse` (~58MB, gitignored)
-- `node_modules/` (gitignored)
-- `/retro` saves JSON snapshots to `.context/retros/` in your project for trend tracking
+- 技能文件（Markdown 提示）在 `~/.claude/skills/gstack/`（或项目安装的 `.claude/skills/gstack/`）
+- `~/.claude/skills/browse`、`~/.claude/skills/qa`、`~/.claude/skills/review` 等位置的符号链接指向 gstack 目录
+- 浏览器二进制文件在 `browse/dist/browse`（约 58MB，gitignored）
+- `node_modules/`（gitignored）
+- `/retro` 将 JSON 快照保存到项目中的 `.context/retros/` 用于趋势跟踪
 
-Everything lives inside `.claude/`. Nothing touches your PATH or runs in the background.
+所有内容都在 `.claude/` 内部。没有任何内容触及您的 PATH 或在后台运行。
 
 ---
 
 ```
 +----------------------------------------------------------------------------+
 |                                                                            |
-|   Are you a great software engineer who loves to write 10K LOC/day         |
-|   and land 10 PRs a day like Garry?                                        |
+|   你是一位优秀的软件工程师，喜欢每天写 10K 行代码         |
+|   并像 Garry 一样每天落地 10 个 PR 吗？                                        |
 |                                                                            |
-|   Come work at YC: ycombinator.com/software                                |
+|   来 YC 工作：ycombinator.com/software                                |
 |                                                                            |
-|   Extremely competitive salary and equity.                                 |
-|   Now hiring in San Francisco, Dogpatch District.                          |
-|   Come join the revolution.                                                |
+|   极具竞争力的薪资和股权。                                 |
+|   现在在旧金山 Dogpatch 区招聘。                          |
+|   来加入革命吧。                                                |
 |                                                                            |
 +----------------------------------------------------------------------------+
 ```
 
 ---
 
-## How I use these skills
+## 我如何使用这些技能
 
-Created by [Garry Tan](https://x.com/garrytan), President & CEO of [Y Combinator](https://www.ycombinator.com/).
+由 [Garry Tan](https://x.com/garrytan) 创建，[Y Combinator](https://www.ycombinator.com/) 的总裁兼 CEO。
 
-I built gstack because I do not want AI coding tools stuck in one mushy mode.
+我构建 gstack 是因为我不希望 AI 编码工具困在一个模糊的模式中。
 
-Planning is not review. Review is not shipping. Founder taste is not engineering rigor. If you blur all of that together, you usually get a mediocre blend of all four.
+计划不是审查。审查不是发布。创始人品味不是工程严格度。如果您把所有这些混在一起，通常会得到四者的平庸混合体。
 
-I want explicit gears.
+我想要明确的档位。
 
-These skills let me tell the model what kind of brain I want right now. I can switch cognitive modes on demand — founder, eng manager, paranoid reviewer, release machine. That is the unlock.
+这些技能让我可以告诉模型我现在想要什么样的大脑。我可以按需切换认知模式 — 创始人、工程经理、偏执的审查者、发布机器。这就是解锁。
 
 ---
 
 ## `/plan-ceo-review`
 
-This is my **founder mode**.
+这是我的**创始人模式**。
 
-This is where I want the model to think with taste, ambition, user empathy, and a long time horizon. I do not want it taking the request literally. I want it asking a more important question first:
+在这里我希望模型以品味、雄心、用户同理心和长远的时间框架来思考。我不希望它按字面意思理解请求。我希望它首先问一个更重要的问题：
 
-**What is this product actually for?**
+**这个产品实际上是做什么的？**
 
-I think of this as **Brian Chesky mode**.
+我将其视为 **Brian Chesky 模式**。
 
-The point is not to implement the obvious ticket. The point is to rethink the problem from the user's point of view and find the version that feels inevitable, delightful, and maybe even a little magical.
+重点不是实施明显的票据。重点是从用户的角度重新思考问题，找到感觉必然、令人愉悦甚至可能有点神奇的版本。
 
-### Example
+### 示例
 
-Say I am building a Craigslist-style listing app and I say:
+假设我正在构建一个 Craigslist 风格的列表应用，我说：
 
-> "Let sellers upload a photo for their item."
+> "让卖家为他们的物品上传一张照片。"
 
-A weak assistant will add a file picker and save an image.
+一个弱助手会添加一个文件选择器并保存图像。
 
-That is not the real product.
+这不是真正的产品。
 
-In `/plan-ceo-review`, I want the model to ask whether "photo upload" is even the feature. Maybe the real feature is helping someone create a listing that actually sells.
+在 `/plan-ceo-review` 中，我希望模型询问"照片上传"是否甚至是一个功能。也许真正的功能是帮助某人创建真正能销售的列表。
 
-If that is the real job, the whole plan changes.
+如果那是真正的工作，整个计划就会改变。
 
-Now the model should ask:
+现在模型应该问：
 
-* Can we identify the product from the photo?
-* Can we infer the SKU or model number?
-* Can we search the web and draft the title and description automatically?
-* Can we pull specs, category, and pricing comps?
-* Can we suggest which photo will convert best as the hero image?
-* Can we detect when the uploaded photo is ugly, dark, cluttered, or low-trust?
-* Can we make the experience feel premium instead of like a dead form from 2007?
+* 我们能从照片中识别产品吗？
+* 我们能推断 SKU 或型号吗？
+* 我们能搜索网络并自动起草标题和描述吗？
+* 我们能拉取规格、类别和定价对比吗？
+* 我们能建议哪张照片作为主图效果最好吗？
+* 我们能检测上传的照片是丑陋、黑暗、混乱还是低信任度的吗？
+* 我们能让体验感觉高级，而不是像 2007 年的死表单吗？
 
-That is what `/plan-ceo-review` does for me.
+这就是 `/plan-ceo-review` 为我做的。
 
-It does not just ask, "how do I add this feature?"
-It asks, **"what is the 10-star product hiding inside this request?"**
+它不只是问，"我如何添加这个功能？"
+它问，**"这个请求中隐藏的 10 星级产品是什么？"**
 
-That is a very different kind of power.
+那是一种非常不同的力量。
 
 ---
 
 ## `/plan-eng-review`
 
-This is my **eng manager mode**.
+这是我的**工程经理模式**。
 
-Once the product direction is right, I want a different kind of intelligence entirely. I do not want more sprawling ideation. I do not want more "wouldn't it be cool if." I want the model to become my best technical lead.
+一旦产品方向正确，我需要一种完全不同的智能。我不想要更多的蔓延式构思。我不想要更多的"如果...会不会很酷"。我希望模型成为我最好的技术主管。
 
-This mode should nail:
+这种模式应该搞定：
 
-* architecture
-* system boundaries
-* data flow
-* state transitions
-* failure modes
-* edge cases
-* trust boundaries
-* test coverage
+* 架构
+* 系统边界
+* 数据流
+* 状态转换
+* 失败模式
+* 边界情况
+* 信任边界
+* 测试覆盖
 
-And one surprisingly big unlock for me: **diagrams**.
+对我来说还有一个令人惊讶的大解锁：**图表**。
 
-LLMs get way more complete when you force them to draw the system. Sequence diagrams, state diagrams, component diagrams, data-flow diagrams, even test matrices. Diagrams force hidden assumptions into the open. They make hand-wavy planning much harder.
+当您强制 LLM 绘制系统时，它们会变得更加完整。序列图、状态图、组件图、数据流图，甚至测试矩阵。图表将隐藏的假设暴露在明面上。它们使模糊的计划变得更加困难。
 
-So `/plan-eng-review` is where I want the model to build the technical spine that can carry the product vision.
+所以 `/plan-eng-review` 是我希望模型构建能够承载产品愿景的技术骨干的地方。
 
-### Example
+### 示例
 
-Take the same listing app example.
+使用相同的列表应用示例。
 
-Let's say `/plan-ceo-review` already did its job. We decided the real feature is not just photo upload. It is a smart listing flow that:
+假设 `/plan-ceo-review` 已经完成了它的工作。我们决定真正的功能不仅仅是照片上传。它是一个智能列表流程，可以：
 
-* uploads photos
-* identifies the product
-* enriches the listing from the web
-* drafts a strong title and description
-* suggests the best hero image
+* 上传照片
+* 识别产品
+* 从网上丰富列表
+* 起草强大的标题和描述
+* 建议最佳主图
 
-Now `/plan-eng-review` takes over.
+现在 `/plan-eng-review` 接管。
 
-Now I want the model to answer questions like:
+现在我希望模型回答这样的问题：
 
-* What is the architecture for upload, classification, enrichment, and draft generation?
-* Which steps happen synchronously, and which go to background jobs?
-* Where are the boundaries between app server, object storage, vision model, search/enrichment APIs, and the listing database?
-* What happens if upload succeeds but enrichment fails?
-* What happens if product identification is low-confidence?
-* How do retries work?
-* How do we prevent duplicate jobs?
-* What gets persisted when, and what can be safely recomputed?
+* 上传、分类、丰富和草稿生成的架构是什么？
+* 哪些步骤同步发生，哪些进入后台作业？
+* 应用服务器、对象存储、视觉模型、搜索/丰富 API 和列表数据库之间的边界在哪里？
+* 如果上传成功但丰富失败会发生什么？
+* 如果产品识别置信度低会发生什么？
+* 重试如何工作？
+* 我们如何防止重复作业？
+* 何时持久化什么，什么可以安全地重新计算？
 
-And this is where I want diagrams — architecture diagrams, state models, data-flow diagrams, test matrices. Diagrams force hidden assumptions into the open. They make hand-wavy planning much harder.
+在这里我想要图表 — 架构图、状态模型、数据流图、测试矩阵。图表将隐藏的假设暴露在明面上。它们使模糊的计划变得更加困难。
 
-That is `/plan-eng-review`.
+这就是 `/plan-eng-review`。
 
-Not "make the idea smaller."
-**Make the idea buildable.**
+不是"让想法变小。"
+**让想法可构建。**
 
 ---
 
 ## `/plan-design-review`
 
-This is my **senior designer mode**.
+这是我的**高级设计师模式**。
 
-Most developers cannot tell whether their site looks AI-generated. I could not, until I started paying attention. There is a growing class of sites that are functional but soulless — they work fine but scream "an AI built this and nobody with taste looked at it." Purple gradients, 3-column icon grids, uniform bubbly border-radius on everything, centered text on every section, decorative blobs floating in the background. The ChatGPT aesthetic.
+大多数开发者无法判断他们的网站看起来是否是 AI 生成的。我以前也不能，直到我开始注意。有一类正在增长的网站，它们功能完善但没有灵魂 — 它们工作正常，但大喊"AI 构建了这个，没有有品味的人看过它。"紫色渐变、3 列图标网格、所有东西上统一的圆角 border-radius、每个部分居中的文本、背景中漂浮的装饰斑点。ChatGPT 美学。
 
-`/plan-design-review` gives the agent a designer's eye.
+`/plan-design-review` 给代理一个设计师的眼睛。
 
-It opens your site and reacts to it the way a Stripe or Linear designer would — immediately, viscerally, with opinions. The first output is a structured gut reaction: what the site communicates at a glance, what the eye is drawn to, and a one-word verdict. That is the most valuable part. Everything after is supporting evidence.
+它打开您的网站，并像 Stripe 或 Linear 设计师那样对它做出反应 — 立即、发自内心地，带有意见。第一个输出是结构化的直觉反应：网站在一瞥中传达了什么，眼睛被什么吸引，以及一个字的裁决。这是最有价值的部分。之后的所有内容都是支持性证据。
 
-Then it extracts your actual design system by reading the CSS: how many fonts are you really using? What is your heading scale? How many colors? Is your spacing on a grid or arbitrary? It structures this as an **Inferred Design System** and offers to save it as a `DESIGN.md` — so now you have a design system you never had before, derived from what you actually shipped.
+然后它通过读取 CSS 提取您的实际设计系统：您实际上在使用多少种字体？您的标题缩放是什么？有多少种颜色？您的间距是在网格上还是任意的？它将其结构化为**推断的设计系统**，并提议将其保存为 `DESIGN.md` — 所以现在您拥有了一个您以前没有的设计系统，从您实际发布的内容派生而来。
 
-The audit covers 80 items across 10 categories. Typography, spacing, hierarchy, color, responsive design, interaction states, motion, content quality, performance feel, and — the headline feature — **AI Slop Detection**. Ten specific anti-patterns that mark a site as machine-generated.
+审查涵盖 10 个类别的 80 个项目。字体、间距、层次结构、颜色、响应式设计、交互状态、动效、内容质量、性能感觉，以及 — 头条功能 — **AI 废话检测**。十种特定的反模式，标记网站为机器生成的。
 
-Every finding gets a letter grade (A through F) per category. The report opens with two headline scores: **Design Score** and **AI Slop Score**. "Your site got a B on design but a D on AI Slop" tells you exactly where to focus.
+每个发现在每个类别中获得字母评分（A 到 F）。报告以两个头条分数开始：**设计评分**和**AI 废话评分**。"您的设计获得 B，但 AI 废话获得 D"确切地告诉您应该专注于哪里。
 
-### Example
+### 示例
 
 ```
 You:   /plan-design-review https://myapp.com
 
-Claude: Design Score: C  |  AI Slop Score: D
+Claude: 设计评分：C  |  AI 废话评分：D
 
-        "The site communicates generic SaaS energy."
-        "I notice the hero section uses a blue-to-purple gradient
-         with a 3-column feature grid below it — the single most
-         recognizable AI-generated layout pattern."
-        "The first 3 things my eye goes to are: the gradient, the
-         symmetrical icon grid, and a 'Get Started' button that
-         looks like every other 'Get Started' button."
-        "If I had to describe this in one word: template."
+        "网站传达通用 SaaS 能量。"
+        "我注意到主图部分使用了蓝紫色渐变，下面是 3 列特性网格 —
+         单一最可识别的 AI 生成布局模式。"
+        "我的眼睛首先看到的 3 个东西是：渐变、对称图标网格，
+         和一个看起来像每个其他"开始"按钮的"开始"按钮。"
+        "如果我用一个词来描述：模板。"
 
-        Inferred Design System:
-        - Fonts: Inter (body), Inter (headings) — 1 font family
-        - Colors: 14 unique non-gray colors (flag: >12)
-        - Heading scale: 36/24/18/16 — flat, no drama between sizes
-        - Spacing: mostly 16px and 24px — no rhythm
+        推断的设计系统：
+        - 字体：Inter（正文），Inter（标题）— 1 个字体系列
+        - 颜色：14 种独特的非灰色颜色（标志：>12）
+        - 标题缩放：36/24/18/16 — 扁平，尺寸之间没有戏剧性
+        - 间距：主要是 16px 和 24px — 没有节奏
 
-        Top 5 Design Improvements:
-        1. Break the 3-column icon grid (High, AI Slop)
-        2. Add heading scale contrast — at least 2:1 ratio (High, Typography)
-        3. Replace uniform border-radius with intentional hierarchy (Medium, Spacing)
-        4. Kill the gradient hero — use a real image or bold typography (High, AI Slop)
-        5. Add a second font for headings — Inter-only reads as generic (Medium, Typography)
+        前 5 个设计改进：
+        1. 打破 3 列图标网格（高，AI 废话）
+        2. 添加标题缩放对比 — 至少 2:1 比例（高，字体）
+        3. 用有意的层次结构替换统一的 border-radius（中等，间距）
+        4. 消除渐变主图 — 使用真实图像或粗体排版（高，AI 废话）
+        5. 为标题添加第二种字体 — 仅 Inter 读起来很通用（中等，字体）
 
-        [Full report saved to .gstack/design-reports/]
-        Want me to save this inferred design system as your DESIGN.md?
+        [完整报告保存到 .gstack/design-reports/]
+        想要我保存这个推断的设计系统作为您的 DESIGN.md 吗？
 ```
 
-This is report only — it never touches your code. Use `/qa-design-review` when you want it to fix what it finds.
+这仅报告 — 从不接触您的代码。当您希望它修复发现的问题时，使用 `/qa-design-review`。
 
 ---
 
 ## `/design-consultation`
 
-This is my **design partner mode**.
+这是我的**设计合作伙伴模式**。
 
-`/plan-design-review` audits a site that already exists. `/design-consultation` is for when you have nothing yet — no design system, no font choices, no color palette. You are starting from zero and you want a senior designer to sit down with you and build the whole visual identity together.
+`/plan-design-review` 审查一个已经存在的网站。`/design-consultation` 是当您什么都没有时 — 没有设计系统，没有字体选择，没有调色板。您从零开始，希望高级设计师与您坐下来一起构建整个视觉标识。
 
-It is a conversation, not a form. The agent asks about your product, your users, and your space. If you want, it researches what top competitors in your category are doing — fonts, colors, layout patterns, aesthetic direction. Then it proposes a complete, coherent design system: aesthetic direction, typography (3+ fonts with specific roles), color palette with hex values, spacing scale, layout approach, and motion strategy. Every recommendation comes with a rationale. Every choice reinforces every other choice.
+这是一个对话，而不是表单。代理询问关于您的产品、您的用户和您的空间。如果您愿意，它会研究您类别中的顶级竞争对手在做什么 — 字体、颜色、布局模式、美学方向。然后它提议一个完整、连贯的设计系统：美学方向、字体（3 种以上具有特定角色的字体）、带有十六进制值的调色板、间距缩放、布局方法和动效策略。每个建议都有理由。每个选择都强化每个其他选择。
 
-The key insight: individual design decisions are easy to make but hard to make coherently. Picking a font is simple. Picking a font that works with your color palette, your spacing density, your aesthetic direction, and your product's personality — that is the actual job. `/design-consultation` solves the coherence problem by proposing everything as one package, then letting you adjust any piece while it checks that the rest still holds together.
+关键见解：单个设计决策很容易做出，但很难连贯地做出。选择一种字体很简单。选择一种与您的调色板、间距密度、美学方向和产品个性配合的字体 — 那才是真正的工作。`/design-consultation` 通过将所有内容作为一个包提议来解决连贯性问题，然后让您调整任何部分，同时检查其余部分仍然保持在一起。
 
-After you agree on the system, it generates an interactive HTML preview page — your fonts rendered at real sizes, your color palette as actual UI components (buttons, cards, form inputs, alerts), light/dark mode toggle, all using your product name instead of lorem ipsum. You open the page in your browser and see the design system rendered before a single line of product code is written.
+在您同意系统后，它会生成交互式 HTML 预览页面 — 您的字体以真实大小渲染，您的调色板作为实际 UI 组件（按钮、卡片、表单输入、警报），明/暗模式切换，所有这些都使用您的产品名称而不是 lorem ipsum。您在浏览器中打开页面，并在编写一行产品代码之前看到设计系统呈现。
 
-Then it writes `DESIGN.md` to your repo root — your project's design source of truth — and updates `CLAUDE.md` so every future Claude Code session respects the system. From that point on, `/qa-design-review` can audit against it, and any agent working on your frontend knows the rules.
+然后它将 `DESIGN.md` 写入您的仓库根目录 — 您项目的设计真实来源 — 并更新 `CLAUDE.md`，以便每个未来的 Claude Code 会话都遵守系统。从那时起，`/qa-design-review` 可以对其进行审计，并且任何在您前端工作的代理都知道规则。
 
 ```
 You:   /design-consultation
 
-Claude: From the README, this looks like a developer analytics dashboard
-        for engineering teams. Sound right? And would you like me to
-        research what other dev tools are doing for design, or should
-        I work from what I know?
+Claude: 从 README 来看，这看起来像是一个面向工程团队的
+        开发者分析仪表板。对吗？您希望我研究其他开发工具在设计方面做什么，
+        还是我根据我已知的内容工作？
 
-You:    Yes, it's a dashboard for eng managers. Research would be great.
+You:    是的，它是面向工程经理的仪表板。研究会很棒。
 
-Claude: I looked at Linear, Vercel, Railway, Planetscale, and Posthog.
-        They converge on clean sans-serifs and muted palettes, but
-        Linear stands out with its dark-first approach and tight spacing.
-        The gap: most of these feel interchangeable. Here's my proposal:
+Claude: 我查看了 Linear、Vercel、Railway、Planetscale 和 Posthog。
+        它们都采用干净的无衬线字体和柔和的调色板，但 Linear 以其暗色优先方法和紧密间距脱颖而出。
+        差距：大多数这些感觉可以互换。这是我的提议：
 
-        AESTHETIC: Industrial/Utilitarian — data-first, no decoration tax
-        TYPOGRAPHY: Geist (body + UI), Instrument Serif (display), JetBrains Mono (data)
-        COLOR: Restrained — slate neutrals, single teal accent (#0D9488)
-        SPACING: 4px base, compact density
-        LAYOUT: Grid-disciplined, 12-column
-        MOTION: Minimal-functional — only transitions that aid comprehension
+        美学：工业/实用主义 — 数据优先，无装饰税
+        字体：Geist（正文 + UI），Instrument Serif（展示），JetBrains Mono（数据）
+        颜色：克制 — 板岩中性色，单一蓝绿色强调色（#0D9488）
+        间距：4px 基数，紧凑密度
+        布局：网格纪律，12 列
+        动效：最小功能 — 仅有助于理解的过渡
 
-        This coheres because the utilitarian aesthetic demands a tight
-        spacing grid and restrained color. The serif display font creates
-        hierarchy contrast without adding visual noise. The monospace for
-        data tables feels native to the engineering audience.
+        这是连贯的，因为实用主义美学需要紧密的间距网格和克制的颜色。
+        衬线展示字体在不增加视觉噪声的情况下创建层次对比。
+        数据表的等宽字体对工程受众来说感觉很原生。
 
-        Want to adjust anything, or should I generate the preview page?
+        想要调整什么，还是我应该生成预览页面？
 
-You:    Generate it.
+You:    生成它。
 
-Claude: Preview opened in your browser.
+Claude: 预览在您的浏览器中打开。
         [/tmp/design-consultation-preview-1710000000.html]
 
-        The page shows Instrument Serif at hero scale, Geist in body
-        paragraphs, JetBrains Mono in a sample data table. Color swatches
-        with your teal accent against slate grays. Buttons, cards, and
-        alerts rendered in both light and dark mode.
+        页面展示主图缩放的 Instrument Serif，正文段落中的 Geist，
+        示例数据表中的 JetBrains Mono。颜色样本带有蓝绿色强调色和板岩灰色。
+        按钮、卡片和警报在亮色和暗色模式下都呈现。
 
-        How does it feel? Want to adjust anything before I write DESIGN.md?
+        感觉如何？在写 DESIGN.md 之前想要调整什么吗？
 
-You:    Looks great. Ship it.
+You:    看起来很棒。发布它。
 
-Claude: Wrote DESIGN.md (typography, color, spacing, layout, motion).
-        Updated CLAUDE.md with design system guidelines.
-        All future sessions will respect these choices.
+Claude: 写入 DESIGN.md（字体、颜色、间距、布局、动效）。
+        更新 CLAUDE.md 以包含设计系统指南。
+        所有未来的会话都将遵守这些选择。
 ```
 
 ---
 
 ## `/qa-design-review`
 
-This is my **designer who codes mode**.
+这是我的**会编码的设计师模式**。
 
-`/plan-design-review` tells you what is wrong. `/qa-design-review` fixes it.
+`/plan-design-review` 告诉您什么是错的。`/qa-design-review` 修复它。
 
-It runs the same 80-item audit, then enters a fix loop: for each design finding, it locates the source file, makes the minimal CSS/styling change, commits with `style(design): FINDING-NNN`, re-navigates to verify, and takes before/after screenshots. One commit per fix, fully bisectable.
+它运行相同的 80 项审查，然后进入修复循环：对于每个设计发现，它定位源文件，进行最小的 CSS/样式更改，使用 `style(design): FINDING-NNN` 提交，重新导航以验证，并拍摄修复前后截图。每个修复一次提交，完全可二分查找。
 
-The self-regulation heuristic is tuned for design work — CSS-only changes get a free pass (they are inherently safe and reversible), but changes to component JSX/TSX files count against the risk budget. Hard cap at 30 fixes. If the risk score exceeds 20%, it stops and asks.
+自我调节启发式针对设计工作进行调整 — 仅 CSS 更改获得免费通行（它们本质上安全且可逆），但对组件 JSX/TSX 文件的更改计入风险预算。硬限制为 30 个修复。如果风险评分超过 20%，它会停止并询问。
 
 ```
 You:   /qa-design-review https://myapp.com
 
-Claude: [Runs full design audit — same output as /plan-design-review]
-        Design Score: C  |  AI Slop Score: D
-        12 findings (4 high, 5 medium, 3 polish)
+Claude: [运行完整的设计审查 — 与 /plan-design-review 相同的输出]
+        设计评分：C  |  AI 废话评分：D
+        12 个发现（4 个高，5 个中，3 个润色）
 
-        Fixing 9 design issues...
+        修复 9 个设计问题...
 
-        style(design): FINDING-001 — replace 3-column icon grid with asymmetric layout
-        style(design): FINDING-002 — add heading scale 48/32/24/18/16
-        style(design): FINDING-003 — remove gradient hero, use bold typography
-        style(design): FINDING-004 — add second font for headings
-        style(design): FINDING-005 — vary border-radius by element role
-        style(design): FINDING-006 — left-align body text, reserve center for headings
-        style(design): FINDING-007 — add hover/focus states to all interactive elements
-        style(design): FINDING-008 — add prefers-reduced-motion media query
-        style(design): FINDING-009 — set max content width to 680px for body text
+        style(design): FINDING-001 — 用不对称布局替换 3 列图标网格
+        style(design): FINDING-002 — 添加标题缩放 48/32/24/18/16
+        style(design): FINDING-003 — 消除渐变主图，使用粗体排版
+        style(design): FINDING-004 — 为标题添加第二种字体
+        style(design): FINDING-005 — 根据元素角色变化 border-radius
+        style(design): FINDING-006 — 左对齐正文文本，将中心保留给标题
+        style(design): FINDING-007 — 为所有交互元素添加悬停/焦点状态
+        style(design): FINDING-008 — 添加 prefers-reduced-motion 媒体查询
+        style(design): FINDING-009 — 将正文内容的最大宽度设置为 680px
 
-        Final audit:
-        Design Score: C → B+  |  AI Slop Score: D → A
-        9 fixes applied (8 verified, 1 best-effort). 3 deferred.
+        最终审查：
+        设计评分：C → B+  |  AI 废话评分：D → A
+        应用 9 个修复（8 个已验证，1 个尽力而为）。3 个推迟。
 
-        [Report with before/after screenshots saved to .gstack/design-reports/]
+        [带修复前后截图的报告保存到 .gstack/design-reports/]
 ```
 
-Nine commits, each touching one concern. The AI Slop score went from D to A because the three most recognizable patterns (gradient hero, 3-column grid, uniform radius) are gone. The design score improved two grades because the typography now has a scale, the spacing has hierarchy, and interactive elements have proper states.
+九次提交，每次触及一个问题。AI 废话评分从 D 上升到 A，因为三个最可识别的模式（渐变主图、3 列网格、统一半径）都消失了。设计评分提高了两个等级，因为字体现在有缩放，间距有层次结构，交互元素有适当的状态。
 
 ---
 
 ## `/review`
 
-This is my **paranoid staff engineer mode**.
+这是我的**偏执的资深工程师模式**。
 
-Passing tests do not mean the branch is safe.
+通过测试并不意味着分支是安全的。
 
-`/review` exists because there is a whole class of bugs that can survive CI and still punch you in the face in production. This mode is not about dreaming bigger. It is not about making the plan prettier. It is about asking:
+`/review` 存在是因为有一类 bug 可以在 CI 中幸存，并在生产环境中给您带来麻烦。这种模式不是关于梦想更大。不是关于让计划更漂亮。它是关于问：
 
-**What can still break?**
+**什么仍然可能出问题？**
 
-This is a structural audit, not a style nitpick pass. I want the model to look for things like:
+这是一种结构审计，而不是风格挑剔。我希望模型寻找这样的东西：
 
-* N+1 queries
-* stale reads
-* race conditions
-* bad trust boundaries
-* missing indexes
-* escaping bugs
-* broken invariants
-* bad retry logic
-* tests that pass while missing the real failure mode
+* N+1 查询
+* 过期读取
+* 竞态条件
+* 糟糕的信任边界
+* 缺失的索引
+* 转义 bug
+* 破坏的不变量
+* 糟糕的重试逻辑
+* 在错过真实失败模式时通过的测试
 
-### Example
+### 示例
 
-Suppose the smart listing flow is implemented and the tests are green.
+假设智能列表流程已实现，测试是绿色的。
 
-`/review` should still ask:
+`/review` 仍然应该问：
 
-* Did I introduce an N+1 query when rendering listing photos or draft suggestions?
-* Am I trusting client-provided file metadata instead of validating the actual file?
-* Can two tabs race and overwrite cover-photo selection or item details?
-* Do failed uploads leave orphaned files in storage forever?
-* Can the "exactly one hero image" rule break under concurrency?
-* If enrichment APIs partially fail, do I degrade gracefully or save garbage?
-* Did I accidentally create a prompt injection or trust-boundary problem by pulling web data into draft generation?
+* 我在渲染列表照片或草稿建议时是否引入了 N+1 查询？
+* 我是否信任客户端提供的文件元数据而不是验证实际文件？
+* 两个选项卡可以竞争并覆盖封面照片选择或项目详细信息吗？
+* 失败的上传会在存储中永远留下孤立文件吗？
+* "恰好一个主图"规则在并发下会破坏吗？
+* 如果丰富 API 部分失败，我会优雅地降级还是保存垃圾？
+* 我是否通过将网页数据拉入草稿生成而意外创建了提示注入或信任边界问题？
 
-That is the point of `/review`.
+这就是 `/review` 的重点。
 
-I do not want flattery here.
-I want the model imagining the production incident before it happens.
+我不希望这里奉承。
+我希望模型在生产事故发生之前想象它。
 
 ---
 
 ## `/ship`
 
-This is my **release machine mode**.
+这是我的**发布机器模式**。
 
-Once I have decided what to build, nailed the technical plan, and run a serious review, I do not want more talking. I want execution.
+一旦我决定了构建什么，确定了技术计划，并进行了严肃的审查，我不想再说话了。我想要执行。
 
-`/ship` is for the final mile. It is for a ready branch, not for deciding what to build.
+`/ship` 用于最后一公里。它用于准备好的分支，不用于决定构建什么。
 
-This is where the model should stop behaving like a brainstorm partner and start behaving like a disciplined release engineer: sync with main, run the right tests, make sure the branch state is sane, update changelog or versioning if the repo expects it, push, and create or update the PR.
+在这里，模型应该停止表现得像头脑风暴伙伴，并开始表现得像自律的发布工程师：与 main 同步，运行正确的测试，确保分支状态正常，如果仓库期望则更新变更日志或版本控制，推送，并创建或更新 PR。
 
-Momentum matters here.
+在这里动量很重要。
 
-A lot of branches die when the interesting work is done and only the boring release work is left. Humans procrastinate that part. AI should not.
+许多分支在有趣的工作完成而只有无聊的发布工作剩余时死亡。人类会拖延那部分。AI 不应该。
 
-### Example
+### 示例
 
-Suppose the smart listing flow is finished.
+假设智能列表流程已完成。
 
-The product thinking is done.
-The architecture is done.
-The review pass is done.
-Now the branch just needs to get landed.
+产品思考已完成。
+架构已完成。
+审查通过已完成。
+现在分支只需要落地。
 
-That is what `/ship` is for.
+这就是 `/ship` 的用途。
 
-It takes care of the repetitive release hygiene so I do not bleed energy on:
+它处理重复的发布卫生工作，所以我不会在这些事情上浪费精力：
 
-* syncing with main
-* rerunning tests
-* checking for weird branch state
-* updating changelog/version metadata
-* pushing the branch
-* opening or updating the PR
+* 与 main 同步
+* 重新运行测试
+* 检查奇怪的分支状态
+* 更新变更日志/版本元数据
+* 推送分支
+* 打开或更新 PR
 
-At this point I do not want more ideation.
-I want the plane landed.
+在这一点上，我不想要更多的构思。
+我想要飞机着陆。
 
 ---
 
-## Greptile integration
+## Greptile 集成
 
-[Greptile](https://greptile.com) is a YC company that reviews your PRs automatically. It catches real bugs — race conditions, security issues, things that pass CI and blow up in production. It has genuinely saved my ass more than once. I love these guys.
+[Greptile](https://greptile.com) 是一家 YC 公司，自动审查您的 PR。它捕获真正的 bug — 竞态条件、安全问题、通过 CI 并在生产环境中爆炸的东西。它真的多次救了我的命。我喜欢这些人。
 
-**Setup:** Install Greptile on your GitHub repo at [greptile.com](https://greptile.com) — it takes about 30 seconds. Once it's reviewing your PRs, gstack picks up its comments automatically. No additional configuration.
+**设置：** 在 [greptile.com](https://greptile.com) 上将 Greptile 安装到您的 GitHub 仓库 — 大约需要 30 秒。一旦它审查您的 PR，gstack 会自动获取其评论。无需额外配置。
 
-The problem with any automated reviewer is triage. Greptile is good, but not every comment is a real issue. Some are false positives. Some flag things you already fixed three commits ago. Without a triage layer, the comments pile up and you start ignoring them — which defeats the purpose.
+任何自动审查者的问题都是分类。Greptile 很好，但并非每个评论都是真正的问题。有些是误报。有些标记您在三个提交前已经修复的东西。没有分类层，评论会堆积，您开始忽略它们 — 这违背了目的。
 
-gstack solves this. `/review` and `/ship` are now Greptile-aware. They read Greptile's comments, classify each one, and take action:
+gstack 解决了这个问题。`/review` 和 `/ship` 现在具有 Greptile 感知能力。它们读取 Greptile 的评论，对每个评论进行分类，并采取行动：
 
-- **Valid issues** get added to the critical findings and fixed before shipping
-- **Already-fixed issues** get an auto-reply acknowledging the catch
-- **False positives** get pushed back — you confirm, and a reply goes out explaining why it's wrong
+- **有效问题**被添加到关键发现中并在发布前修复
+- **已修复的问题**获得自动回复确认捕获
+- **误报**被推回 — 您确认，并发出回复解释为什么它是错误的
 
-The result is a two-layer review: Greptile catches things asynchronously on the PR, then `/review` and `/ship` triage those findings as part of the normal workflow. Nothing falls through the cracks.
+结果是两层审查：Greptile 在 PR 上异步捕获内容，然后 `/review` 和 `/ship` 作为正常工作流程的一部分对这些发现进行分类。没有任何东西会漏掉。
 
-It also learns. Every false positive you confirm gets saved to `~/.gstack/greptile-history.md`. Future runs auto-skip known FP patterns for your codebase. And `/retro` tracks Greptile's batting average over time — so you can see whether the signal-to-noise ratio is improving.
+它还会学习。您确认的每个误报都会保存到 `~/.gstack/greptile-history.md`。未来的运行会自动跳过您代码库的已知误报模式。`/retro` 会跟踪 Greptile 随时间的命中率 — 所以您可以看到信噪比是否在改善。
 
-### Example
+### 示例
 
 ```
 You:   /ship
 
-Claude: [syncs main, runs tests, pre-landing review...]
+Claude: [同步 main，运行测试，预落地审查...]
 
-        Greptile found 3 comments on this PR:
+        Greptile 在此 PR 上发现 3 条评论：
 
-        [VALID] app/services/payment_service.rb:47 — Race condition:
-        concurrent charges can double-debit. Recommend DB-level advisory
-        lock around the charge block.
+        [有效] app/services/payment_service.rb:47 — 竞态条件：
+        并发费用可以双重扣款。建议在费用块周围使用数据库级建议锁。
         → https://github.com/you/app/pull/42#discussion_r123
 
-        [ALREADY FIXED] app/models/user.rb:12 — Missing null check
-        on email before downcase.
-        → Already fixed in commit abc1234. Auto-replying.
+        [已修复] app/models/user.rb:12 — 在 email 上小写之前缺少空检查。
+        → 已在提交 abc1234 中修复。自动回复。
 
-        [FALSE POSITIVE] lib/auth.rb:88 — "Token comparison should
-        use constant-time comparison." We already use
-        ActiveSupport::SecurityUtils.secure_compare here.
+        [误报] lib/auth.rb:88 — "令牌比较应该使用常量时间比较。"
+        我们已经在这里使用 ActiveSupport::SecurityUtils.secure_compare。
         → https://github.com/you/app/pull/42#discussion_r125
 
-        Fixing the race condition in payment_service.rb...
-        Applied advisory lock. Committed: fix: address Greptile
-        review — advisory lock on concurrent charges
+        修复 payment_service.rb 中的竞态条件...
+        应用了建议锁。已提交：fix: address Greptile review — advisory lock on concurrent charges
 
-        The auth token comment is a false positive — we're already
-        using secure_compare.
+        身份验证令牌评论是误报 — 我们已经在使用 secure_compare。
 
-        Options for the false positive:
-          A) Reply to Greptile explaining (recommended)
-          B) Fix it anyway
-          C) Ignore
+        误报的选项：
+          A) 回复 Greptile 解释（推荐）
+          B) 无论如何修复它
+          C) 忽略
 
 You:    A
 
-Claude: Replied to Greptile. Re-running tests after the fix...
-        All tests pass. Continuing to version bump.
+Claude: 已回复 Greptile。修复后重新运行测试...
+        所有测试通过。继续版本升级。
 
-        [creates PR with Greptile Review section in body]
+        [在正文中创建带有 Greptile 审查部分的 PR]
         PR: https://github.com/you/app/pull/42
 ```
 
-Three Greptile comments. One real fix. One auto-acknowledged. One false positive pushed back with a reply. Total extra time: about 30 seconds. And the PR body has the full audit trail.
+三个 Greptile 评论。一个真正的修复。一个自动确认。一个带有回复的误报被推回。总额外时间：大约 30 秒。PR 正文有完整的审计跟踪。
 
 ---
 
 ## `/browse`
 
-This is my **QA engineer mode**.
+这是我的**QA 工程师模式**。
 
-`/browse` is the skill that closes the loop. Before it, the agent could think and code but was still half blind. It had to guess about UI state, auth flows, redirects, console errors, empty states, and broken layouts. Now it can just go look.
+`/browse` 是关闭循环的技能。在它之前，代理可以思考和编码，但仍然是半盲的。它必须猜测 UI 状态、身份验证流程、重定向、控制台错误、空状态和损坏的布局。现在它可以直接去看。
 
-That is a real step-change. The full cycle becomes: plan, code, run the app, inspect the UI, reproduce the bug, verify the fix, ship. QA stops being "go click around manually" and becomes part of the same agentic loop. It gives the agent eyes. Now it can do the boring, high-context QA work itself: click through the app, catch breakage, verify the fix, and keep going. That feels like having a real operator in the machine.
+这是一个真正的步骤变化。完整循环变为：计划、编码、运行应用、检查 UI、重现 bug、验证修复、发布。QA 不再是"手动四处点击"，而成为相同代理循环的一部分。它给代理眼睛。现在它可以自己做无聊、高上下文的 QA 工作：点击应用、捕获损坏、验证修复并继续。这感觉就像机器中有真正的操作员。
 
-It is a compiled binary that talks to a persistent Chromium daemon — built on [Playwright](https://playwright.dev/) by Microsoft. First call starts the browser (~3s). Every call after that: ~100-200ms. The browser stays running between commands, so cookies, tabs, and localStorage carry over.
+它是一个编译后的二进制文件，与持久的 Chromium 守护进程通信 — 由 Microsoft 基于 [Playwright](https://playwright.dev/) 构建。第一次调用启动浏览器（约 3 秒）。之后的每次调用：约 100-200 毫秒。浏览器在命令之间保持运行，所以 cookie、选项卡和 localStorage 会延续。
 
-After I push a branch, I tell Claude to go check staging. It does the entire QA pass for me:
+在推送分支后，我告诉 Claude 去检查 staging。它为我完成整个 QA 流程：
 
 ```
-You:   /browse staging.myapp.com — log in, test the signup flow, and check
-       every page I changed in this branch
+You:   /browse staging.myapp.com — 登录，测试注册流程，并检查
+       我在此分支中更改的每个页面
 
-Claude: [18 tool calls, ~60 seconds]
+Claude: [18 个工具调用，约 60 秒]
 
         > browse goto https://staging.myapp.com/signup
         > browse snapshot -i
@@ -616,228 +602,229 @@ Claude: [18 tool calls, ~60 seconds]
         > browse screenshot /tmp/signup.png
         > Read /tmp/signup.png
 
-        Signup works. Redirected to onboarding. Now checking changed pages.
+        注册有效。重定向到入门。现在检查更改的页面。
 
         > browse goto https://staging.myapp.com/dashboard
         > browse screenshot /tmp/dashboard.png
         > Read /tmp/dashboard.png
         > browse console
 
-        Dashboard loads. No console errors. Charts render with sample data.
+        仪表板加载。没有控制台错误。图表用示例数据呈现。
 
         > browse goto https://staging.myapp.com/settings/billing
         > browse screenshot /tmp/billing.png
         > Read /tmp/billing.png
 
-        Billing page loads. Plan selector shows Free/Pro/Enterprise.
-        Stripe elements render correctly.
+        计费页面加载。计划选择器显示免费/专业/企业版。
+        Stripe 元素正确呈现。
 
         > browse goto https://staging.myapp.com/api/health
         > browse text
 
-        API health endpoint returns {"status":"ok","version":"2.4.1"}.
+        API 健康端点返回 {"status":"ok","version":"2.4.1"}。
 
-        All 4 pages load correctly. No console errors. No broken layouts.
-        Signup → onboarding → dashboard flow works end to end.
+        所有 4 个页面正确加载。没有控制台错误。没有损坏的布局。
+        注册 → 入门 → 仪表板流程端到端有效。
 ```
 
-18 tool calls, about a minute. It signed up a test user, navigated every page I changed, took screenshots, read them, checked the console for errors, and verified the API. That is a full QA pass. I did not open a browser.
+18 个工具调用，大约一分钟。它注册了测试用户，导航了我更改的每个页面，截图，读取它们，检查控制台错误，并验证了 API。这是一个完整的 QA 流程。我没有打开浏览器。
 
-It works for reading documentation, verifying deployments, filling out forms, taking screenshots, comparing pages across environments, and anything else where Claude needs eyes on a live URL.
+它适用于阅读文档、验证部署、填写表单、截图、跨环境比较页面，以及 Claude 需要在实时 URL 上查看眼睛的任何其他情况。
 
-**Security note:** `/browse` runs a persistent Chromium session. Cookies, localStorage, and session state carry over between commands. Do not use it against sensitive production environments unless you intend to — it is a real browser with real state. The session auto-shuts down after 30 minutes of idle time.
+**安全说明：** `/browse` 运行持久的 Chromium 会话。Cookie、localStorage 和会话状态在命令之间延续。除非您有意，否则不要将其用于敏感的生产环境 — 它是带有真实状态的真实浏览器。会话在空闲 30 分钟后自动关闭。
 
-For the full command reference, technical internals, and architecture details, see [BROWSER.md](BROWSER.md).
+有关完整的命令参考、技术内部和架构详细信息，请参阅 [BROWSER.md](BROWSER.md)。
 
 ---
 
 ## `/qa`
 
-This is my **QA lead mode**.
+这是我的**QA 主管模式**。
 
-`/browse` gives the agent eyes. `/qa` gives it a testing methodology.
+`/browse` 给代理眼睛。`/qa` 给它测试方法论。
 
-The most common use case: you're on a feature branch, you just finished coding, and you want to verify everything works. Just say `/qa` — it reads your git diff, identifies which pages and routes your changes affect, spins up the browser, and tests each one. No URL required. No manual test plan. It figures out what to test from the code you changed.
+最常见的用例：您在功能分支上，刚刚完成编码，并希望验证一切正常。只需说 `/qa` — 它读取您的 git 差异，识别您的更改影响哪些页面和路由，启动浏览器，并测试每个页面。不需要 URL。不需要手动测试计划。它根据您更改的代码弄清楚要测试什么。
 
 ```
 You:   /qa
 
-Claude: Analyzing branch diff against main...
-        12 files changed: 3 controllers, 2 views, 4 services, 3 tests
+Claude: 分析分支与 main 的差异...
+        12 个文件更改：3 个控制器，2 个视图，4 个服务，3 个测试
 
-        Affected routes: /listings/new, /listings/:id, /api/listings
-        Detected app running on localhost:3000.
+        受影响的路由：/listings/new, /listings/:id, /api/listings
+        检测到应用在 localhost:3000 上运行。
 
-        [Tests each affected page — navigates, fills forms, clicks buttons,
-        screenshots, checks console errors]
+        [测试每个受影响的页面 — 导航、填写表单、点击按钮、
+         截图、检查控制台错误]
 
-        QA Report: 3 routes tested, all working.
-        - /listings/new: upload + enrichment flow works end to end
-        - /listings/:id: detail page renders correctly
-        - /api/listings: returns 200 with expected shape
-        No console errors. No regressions on adjacent pages.
+        QA 报告：3 个路由测试，全部正常。
+        - /listings/new：上传 + 丰富流程端到端有效
+        - /listings/:id：详情页面正确呈现
+        - /api/listings：返回带有预期形状的 200
+        没有控制台错误。相邻页面上没有回归。
 ```
 
-Four modes:
+四种模式：
 
-- **Diff-aware** (automatic on feature branches) — reads `git diff main`, identifies affected pages, tests them specifically. The fastest path from "I just wrote code" to "it works."
-- **Full** — systematic exploration of the entire app. 5-15 minutes depending on app size. Documents 5-10 well-evidenced issues.
-- **Quick** (`--quick`) — 30-second smoke test. Homepage + top 5 nav targets. Loads? Console errors? Broken links?
-- **Regression** (`--regression baseline.json`) — run full mode, then diff against a previous baseline. Which issues are fixed? Which are new? What's the score delta?
+- **差异感知**（在功能分支上自动）— 读取 `git diff main`，识别受影响的页面，专门测试它们。从"我刚刚写了代码"到"它有效"的最快路径。
+- **完整** — 系统地探索整个应用。5-15 分钟，取决于应用大小。记录 5-10 个有证据的问题。
+- **快速**（`--quick`）— 30 秒冒烟测试。首页 + 前 5 个导航目标。加载？控制台错误？损坏的链接？
+- **回归**（`--regression baseline.json`）— 运行完整模式，然后与先前的基准进行比较。哪些问题已修复？哪些是新的？分数差异是多少？
 
 ```
 You:   /qa https://staging.myapp.com
 
-Claude: [Explores 12 pages, fills 3 forms, tests 2 flows]
+Claude: [探索 12 个页面，填写 3 个表单，测试 2 个流程]
 
-        QA Report: staging.myapp.com — Health Score: 72/100
+        QA 报告：staging.myapp.com — 健康评分：72/100
 
-        Top 3 Issues:
-        1. CRITICAL: Checkout form submits with empty required fields
-        2. HIGH: Mobile nav menu doesn't close after selecting an item
-        3. MEDIUM: Dashboard chart overlaps sidebar below 1024px
+        前 3 个问题：
+        1. 关键：结账表单在必填字段为空时提交
+        2. 高：移动导航菜单在选择项目后不关闭
+        3. 中：仪表板图表在 1024px 以下与侧边栏重叠
 
-        [Full report with screenshots saved to .gstack/qa-reports/]
+        [完整报告及截图保存到 .gstack/qa-reports/]
 ```
 
-Reports and screenshots accumulate in `.gstack/qa-reports/` so you can track quality over time and compare runs.
+报告和截图累积在 `.gstack/qa-reports/` 中，以便您可以随时间跟踪质量并比较运行。
 
-**Testing authenticated pages:** Use `/setup-browser-cookies` first to import your real browser sessions, then `/qa` can test pages behind login.
+**测试经过身份验证的页面：** 首先使用 `/setup-browser-cookies` 导入真实的浏览器会话，然后 `/qa` 可以测试登录后面的页面。
 
 ---
 
 ## `/setup-browser-cookies`
 
-This is my **session manager mode**.
+这是我的**会话管理器模式**。
 
-Before `/qa` or `/browse` can test authenticated pages, they need cookies. Instead of manually logging in through the headless browser every time, `/setup-browser-cookies` imports your real sessions directly from your daily browser.
+在 `/qa` 或 `/browse` 可以测试经过身份验证的页面之前，它们需要 cookie。不用每次都通过无头浏览器手动登录，`/setup-browser-cookies` 直接从您的日常浏览器导入真实会话。
 
-It auto-detects installed Chromium browsers (Comet, Chrome, Arc, Brave, Edge), decrypts cookies via the macOS Keychain, and loads them into the Playwright session. An interactive picker UI lets you choose exactly which domains to import — no cookie values are ever displayed.
+它自动检测已安装的 Chromium 浏览器（Comet、Chrome、Arc、Brave、Edge），通过 macOS 钥匙链解密 cookie，并将它们加载到 Playwright 会话中。交互式选择器 UI 让您准确选择要导入的域 — 永不显示 cookie 值。
 
 ```
 You:   /setup-browser-cookies
 
-Claude: Cookie picker opened — select the domains you want to import
-        in your browser, then tell me when you're done.
+Claude: Cookie 选择器已打开 — 在浏览器中选择您想要导入的域，
+        然后在完成时告诉我。
 
-        [You pick github.com, myapp.com in the browser UI]
+        [您在浏览器 UI 中选择 github.com, myapp.com]
 
-You:    done
+You:    完成
 
-Claude: Imported 2 domains (47 cookies). Session is ready.
+Claude: 已导入 2 个域（47 个 cookie）。会话已就绪。
 ```
 
-Or skip the UI entirely:
+或者完全跳过 UI：
 
 ```
 You:   /setup-browser-cookies github.com
 
-Claude: Imported 12 cookies for github.com from Comet.
+Claude: 已从 Comet 导入 github.com 的 12 个 cookie。
 ```
 
-First import per browser triggers a macOS Keychain prompt — click "Allow" or "Always Allow."
+每种浏览器的第一次导入会触发 macOS 钥匙链提示 — 单击"允许"或"始终允许"。
 
 ---
 
 ## `/retro`
 
-This is my **engineering manager mode**.
+这是我的**工程经理模式**。
 
-At the end of the week I want to know what actually happened. Not vibes — data. `/retro` analyzes commit history, work patterns, and shipping velocity and writes a candid retrospective.
+在周末结束时，我想知道实际发生了什么。不是感觉 — 是数据。`/retro` 分析提交历史、工作模式和发布速度，并撰写坦诚的回顾。
 
-It is team-aware. It identifies who is running the command, gives you the deepest treatment on your own work, then breaks down every contributor with specific praise and growth opportunities — the kind of feedback you would actually give in a 1:1. It computes metrics like commits, LOC, test ratio, PR sizes, and fix ratio. It detects coding sessions from commit timestamps, finds hotspot files, tracks shipping streaks, and identifies the biggest ship of the week.
+它是团队感知的。它识别谁在运行命令，给您自己的工作最深入的处理，然后用具体的赞扬和成长机会分解每个贡献者 — 您在 1:1 中实际会给出的反馈类型。它计算提交、LOC、测试比率、PR 大小和修复比率等指标。它从提交时间戳检测编码会话，找到热点文件，跟踪发布连续性，并识别本周最大的发布。
 
 ```
 You:   /retro
 
-Claude: Week of Mar 1: 47 commits (3 contributors), 3.2k LOC, 38% tests, 12 PRs, peak: 10pm | Streak: 47d
+Claude: 3 月 1 日这一周：47 次提交（3 位贡献者），3.2k LOC，38% 测试，
+        12 个 PR，峰值：晚上 10 点 | 连续性：47 天
 
-        ## Your Week
-        32 commits, +2.4k LOC, 41% tests. Peak hours: 9-11pm.
-        Biggest ship: cookie import system (browser decryption + picker UI).
-        What you did well: shipped a complete feature with encryption, UI, and
-        18 unit tests in one focused push...
+        ## 您的一周
+        32 次提交，+2.4k LOC，41% 测试。高峰时间：晚上 9-11 点。
+        最大发布：cookie 导入系统（浏览器解密 + 选择器 UI）。
+        您做得好的地方：在一次集中推进中发布了一个带有加密、UI 和
+         18 个单元测试的完整功能...
 
-        ## Team Breakdown
+        ## 团队分解
 
         ### Alice
-        12 commits focused on app/services/. Every PR under 200 LOC — disciplined.
-        Opportunity: test ratio at 12% — worth investing before payment gets more complex.
+        12 次提交专注于 app/services/。每个 PR 低于 200 LOC — 自律。
+        机会：测试比率 12% — 在支付变得更加复杂之前值得投资。
 
         ### Bob
-        3 commits — fixed the N+1 query on dashboard. Small but high-impact.
-        Opportunity: only 1 active day this week — check if blocked on anything.
+        3 次提交 — 修复了仪表板上的 N+1 查询。小但影响大。
+        机会：本周只有 1 个活跃日 — 检查是否被任何东西阻挡。
 
-        [Top 3 team wins, 3 things to improve, 3 habits for next week]
+        [前 3 个团队胜利，3 件需要改进的事情，3 个下周习惯]
 ```
 
-It saves a JSON snapshot to `.context/retros/` so the next run can show trends. Run `/retro compare` to see this week vs last week side by side.
+它将 JSON 快照保存到 `.context/retros/`，以便下一次运行可以显示趋势。运行 `/retro compare` 并排查看本周与上周。
 
 ---
 
 ## `/document-release`
 
-This is my **technical writer mode**.
+这是我的**技术文档编写者模式**。
 
-After `/ship` creates the PR but before it merges, `/document-release` reads every documentation file in the project and cross-references it against the diff. It updates file paths, command lists, project structure trees, and anything else that drifted. Risky or subjective changes get surfaced as questions — everything else is handled automatically.
+在 `/ship` 创建 PR 之后但在合并之前，`/document-release` 读取项目中的每个文档文件，并根据差异交叉引用它。它更新文件路径、命令列表、项目结构树以及任何其他漂移的内容。有风险或主观的更改作为问题提出 — 其他所有内容都自动处理。
 
 ```
 You:   /document-release
 
-Claude: Analyzing 21 files changed across 3 commits. Found 8 documentation files.
+Claude: 分析 3 次提交中更改的 21 个文件。发现 8 个文档文件。
 
-        README.md: updated skill count from 9 to 10, added new skill to table
-        CLAUDE.md: added new directory to project structure
-        CONTRIBUTING.md: current — no changes needed
-        TODOS.md: marked 2 items complete, added 1 new item
+        README.md：将技能计数从 9 更新到 10，将新技能添加到表格
+        CLAUDE.md：将新目录添加到项目结构
+        CONTRIBUTING.md：当前 — 无需更改
+        TODOS.md：标记 2 个项目完成，添加 1 个新项目
 
-        All docs updated and committed. PR body updated with doc diff.
+        所有文档已更新并提交。PR 正文已更新文档差异。
 ```
 
-It also polishes CHANGELOG voice (without ever overwriting entries), cleans up completed TODOS, checks cross-doc consistency, and asks about VERSION bumps only when appropriate.
+它还会润色 CHANGELOG 语气（从不覆盖条目），清理完成的 TODOS，检查跨文档一致性，并仅在适当时询问 VERSION 升级。
 
 ---
 
-## Troubleshooting
+## 故障排除
 
-**Skill not showing up in Claude Code?**
-Run `cd ~/.claude/skills/gstack && ./setup` (or `cd .claude/skills/gstack && ./setup` for project installs). This rebuilds symlinks so Claude can discover the skills.
+**技能没有在 Claude Code 中显示？**
+运行 `cd ~/.claude/skills/gstack && ./setup`（或项目安装的 `cd .claude/skills/gstack && ./setup`）。这会重建符号链接，以便 Claude 可以发现技能。
 
-**`/browse` fails or binary not found?**
-Run `cd ~/.claude/skills/gstack && bun install && bun run build`. This compiles the browser binary. Requires Bun v1.0+.
+**`/browse` 失败或找不到二进制文件？**
+运行 `cd ~/.claude/skills/gstack && bun install && bun run build`。这会编译浏览器二进制文件。需要 Bun v1.0+。
 
-**Project copy is stale?**
-Run `/gstack-upgrade` — it updates both the global install and any vendored project copy automatically.
+**项目副本过时？**
+运行 `/gstack-upgrade` — 它会自动更新全局安装和任何供应商项目副本。
 
-**`bun` not installed?**
-Install it: `curl -fsSL https://bun.sh/install | bash`
+**`bun` 未安装？**
+安装它：`curl -fsSL https://bun.sh/install | bash`
 
-## Upgrading
+## 升级
 
-Run `/gstack-upgrade` in Claude Code. It detects your install type (global or vendored), upgrades, syncs any project copies, and shows what's new.
+在 Claude Code 中运行 `/gstack-upgrade`。它会检测您的安装类型（全局或供应商），升级，同步任何项目副本，并显示新内容。
 
-Or set `auto_upgrade: true` in `~/.gstack/config.yaml` to upgrade automatically whenever a new version is available.
+或者设置 `auto_upgrade: true` 在 `~/.gstack/config.yaml` 中，以便在新版本可用时自动升级。
 
-## Uninstalling
+## 卸载
 
-Paste this into Claude Code:
+将此粘贴到 Claude Code：
 
-> Uninstall gstack: remove the skill symlinks by running `for s in browse plan-ceo-review plan-eng-review plan-design-review design-consultation review ship retro qa qa-only qa-design-review setup-browser-cookies document-release; do rm -f ~/.claude/skills/$s; done` then run `rm -rf ~/.claude/skills/gstack` and remove the gstack section from CLAUDE.md. If this project also has gstack at .claude/skills/gstack, remove it by running `for s in browse plan-ceo-review plan-eng-review plan-design-review review ship retro qa qa-only qa-design-review setup-browser-cookies document-release; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/gstack` and remove the gstack section from the project CLAUDE.md too.
+> 卸载 gstack：通过运行 `for s in browse plan-ceo-review plan-eng-review plan-design-review design-consultation review ship retro qa qa-only qa-design-review setup-browser-cookies document-release; do rm -f ~/.claude/skills/$s; done` 删除技能符号链接，然后运行 `rm -rf ~/.claude/skills/gstack` 并从 CLAUDE.md 中删除 gstack 部分。如果此项目在 .claude/skills/gstack 也有 gstack，通过运行 `for s in browse plan-ceo-review plan-eng-review plan-design-review review ship retro qa qa-only qa-design-review setup-browser-cookies document-release; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/gstack` 删除它，并从项目 CLAUDE.md 中也删除 gstack 部分。
 
-## Development
+## 开发
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, testing, and dev mode. See [ARCHITECTURE.md](ARCHITECTURE.md) for design decisions and system internals. See [BROWSER.md](BROWSER.md) for the browse command reference.
+请参阅 [CONTRIBUTING.md](CONTRIBUTING.md) 了解设置、测试和开发模式。请参阅 [ARCHITECTURE.md](ARCHITECTURE.md) 了解设计决策和系统内部。请参阅 [BROWSER.md](BROWSER.md) 了解 browse 命令参考。
 
-### Testing
+### 测试
 
 ```bash
-bun test                     # free static tests (<5s)
-EVALS=1 bun run test:evals   # full E2E + LLM evals (~$4, ~20min)
-bun run eval:watch            # live dashboard during E2E runs
+bun test                     # 免费静态测试（<5s）
+EVALS=1 bun run test:evals   # 完整 E2E + LLM 评估（~$4，~20 分钟）
+bun run eval:watch            # E2E 运行期间的实时仪表板
 ```
 
-E2E tests stream real-time progress, write machine-readable diagnostics, and persist partial results that survive kills. See CONTRIBUTING.md for the full eval infrastructure.
+E2E 测试流式传输实时进度，写入机器可读的诊断，并持久化在杀进程中存活的局部结果。有关完整的评估基础设施，请参阅 CONTRIBUTING.md。
 
-## License
+## 许可证
 
 MIT

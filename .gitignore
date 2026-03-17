@@ -2,7 +2,7 @@
 node_modules/
 browse/dist/
 .gstack/
-.claude/skills/
+.claude
 /tmp/
 *.log
 bun.lock
